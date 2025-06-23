@@ -89,6 +89,3 @@ Use XAMPP, WAMP, MAMP, or another PHP server. Browsers won’t run PHP scripts d
 
 📜 License
 MIT License — use freely, modify openly.
-
-You can now copy and paste this into a `README.md` file in your project folder. Let me know if you'd like a ZIP-ready project structure or GitHub-ready formatting.
-
