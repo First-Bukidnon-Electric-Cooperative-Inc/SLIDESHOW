@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>OBS Slideshow</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background-color: black;
+      width: 100vw;
+      height: 100vh;
+    }
+    #slideshow {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      z-index: 0;
+    }
+    #slideshow img {
+      width: 100vw;
+      height: 100vh;
+      object-fit: contain; /* ⭐️ Change here: fit image without cropping */
+      position: absolute;
+      top: 0;
+      left: 0;
+      opacity: 0;
+      transition: opacity 1s ease-in-out;
+      background-color: black;
+    }
+    #slideshow img.active {
+      opacity: 1;
+      z-index: 1;
+    }
+  </style>
+</head>
+<body>
+
+<div id="slideshow"></div>
+
+<script>
+  const apiUrl = 'image-list.php';
+  let current = 0;
+  let imageUrls = [];
+
+  function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  }
+
+  async function fetchImageList() {
+    try {
+      const response = await fetch(apiUrl);
+      let newList = await response.json();
+      newList = shuffleArray(newList);
+
+      if (JSON.stringify(newList) !== JSON.stringify(imageUrls)) {
+        imageUrls = newList;
+        updateSlideshow();
+      }
+    } catch (err) {
+      console.error('Error fetching images:', err);
+    }
+  }
+
+  function updateSlideshow() {
+    const container = document.getElementById('slideshow');
+    container.innerHTML = '';
+
+    imageUrls.forEach((url, index) => {
+      const img = document.createElement('img');
+      img.src = url;
+      if (index === 0) img.classList.add('active');
+      container.appendChild(img);
+    });
+
+    current = 0;
+  }
+
+  function rotateImages() {
+    const images = document.querySelectorAll('#slideshow img');
+    if (images.length === 0) return;
+
+    images[current].classList.remove('active');
+    current = (current + 1) % images.length;
+    images[current].classList.add('active');
+  }
+
+  setInterval(fetchImageList, 10000); // Refresh image list every 10s
+  setInterval(rotateImages, 5000);    // Change image every 5s
+
+  fetchImageList();
+</script>
+
+</body>
+</html>
